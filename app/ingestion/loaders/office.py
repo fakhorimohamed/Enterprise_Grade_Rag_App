@@ -1,4 +1,5 @@
-from base import BaseClass
+from app.ingestion.loaders.base import BaseClass
+
 from unstructured.partition.auto import partition
 import logfire
 

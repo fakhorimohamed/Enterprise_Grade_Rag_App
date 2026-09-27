@@ -1,6 +1,7 @@
 from pypdf import PdfReader
 
-from base import BaseClass
+from app.ingestion.loaders.base import BaseClass
+
 import logfire
 
 class PdfLoader (BaseClass): 

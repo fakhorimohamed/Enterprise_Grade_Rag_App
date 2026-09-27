@@ -1,4 +1,4 @@
-from base import BaseClass
+from app.ingestion.loaders.base import BaseClass
 import logfire
 
 class TextLoader(BaseClass) :
