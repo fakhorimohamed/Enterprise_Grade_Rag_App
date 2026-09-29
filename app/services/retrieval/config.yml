@@ -1,0 +1,9 @@
+# app/config/embedding_config.yaml
+embedding:
+  batch_size: 64
+  embedding_dim: 1024
+  jina:
+    url: "https://api.jina.ai/v1/embeddings"
+    model: "jina-embeddings-v3"
+  fallback:
+    model: "mixedbread-ai/mxbai-embed-large-v1"
