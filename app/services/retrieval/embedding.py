@@ -3,7 +3,7 @@ from app.services.retrieval.jina_embed import JinaEmbeddingProvider
 from app.services.retrieval.fallback_embed import LocalFallbackProvider 
 from app.services.retrieval.configloader import EmbeddingConfig
 from app.services.retrieval.embed_provider import EmbeddingProvider 
-from app.config import settings 
+from app.configs.config import settings
 from pathlib import Path 
 import logfire 
 from typing import List 
@@ -47,11 +47,8 @@ class EmbeddingService:
         return result[0]
 
 
-# ==============================================================================
-# 6. MODULE EXPORTS (Singleton-like usage)
-# ==============================================================================
 # Initialize once with the path to your YAML file
-_embedding_service = EmbeddingService(config_path="app/services/retrieval/config.yml")
+_embedding_service = EmbeddingService(config_path="app/configs/config_embed.yml")
 
 def get_embedding_dim() -> int:
     return _embedding_service.dimension

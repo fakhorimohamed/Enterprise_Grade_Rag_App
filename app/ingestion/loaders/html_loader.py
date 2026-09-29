@@ -1,5 +1,4 @@
 from app.ingestion.loaders.base import BaseClass
-
 from bs4 import BeautifulSoup 
 import logfire
 
