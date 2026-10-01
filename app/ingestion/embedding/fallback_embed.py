@@ -1,6 +1,6 @@
 
-from app.services.retrieval.configloader import EmbeddingConfig 
-from app.services.retrieval.embed_provider import EmbeddingProvider 
+from app.ingestion.embedding.configloader import EmbeddingConfig 
+from app.ingestion.embedding.embed_provider import EmbeddingProvider 
 from sentence_transformers import SentenceTransformer
 import logfire 
 from typing import List 

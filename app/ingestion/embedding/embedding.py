@@ -1,8 +1,8 @@
 
-from app.services.retrieval.jina_embed import JinaEmbeddingProvider 
-from app.services.retrieval.fallback_embed import LocalFallbackProvider 
-from app.services.retrieval.configloader import EmbeddingConfig
-from app.services.retrieval.embed_provider import EmbeddingProvider 
+from app.ingestion.embedding.jina_embed import JinaEmbeddingProvider 
+from app.ingestion.embedding.fallback_embed import LocalFallbackProvider 
+from app.ingestion.embedding.configloader import EmbeddingConfig
+from app.ingestion.embedding.embed_provider import EmbeddingProvider 
 from app.configs.config import settings
 from pathlib import Path 
 import logfire 
