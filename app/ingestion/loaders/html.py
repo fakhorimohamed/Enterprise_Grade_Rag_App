@@ -1,14 +1,11 @@
-from app.ingestion.loaders.base import BaseClass
+from app.ingestion.loaders.base import BaseLoader
 from bs4 import BeautifulSoup 
 import logfire
 
 
-class HtmlLoader (BaseClass) :
-    def __init__ (self) :
-        pass
-    
-    
-    def Load(self , file_path: str)-> str :
+class HtmlLoader (BaseLoader) :
+    @classmethod
+    def Load(cls , file_path: str)-> str :
             """
             Parses HTML content using BeautifulSoup.
             Cleans scripts, styles, and extracts readable text for RAG.

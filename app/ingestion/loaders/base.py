@@ -1,12 +1,10 @@
 
 from abc import ABC , abstractmethod
 
-class BaseClass (ABC): 
-    def __init () :
-        pass 
-    
+class BaseLoader (ABC): 
+    @classmethod
     @abstractmethod 
-    def Load (self , file_path : str ) -> str:
+    def Load (cls , file_path : str ) -> str:
         " Load Data from the source" 
         pass 
     

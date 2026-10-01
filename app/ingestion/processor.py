@@ -1,4 +1,4 @@
-from app.ingestion.qdrant_service import VectorStoreAdapter
+from app.core.qdrant_service import VectorStoreAdapter
 from app.ingestion.metadata_stor import LocalMetadataStore 
 
 from app.ingestion.loaders.load_factory import LoaderFactory
@@ -6,12 +6,12 @@ from app.ingestion.loaders.load_factory import LoaderFactory
 
 import os
 import logfire
-
-from app.ingestion.qdrant_service import VectorStoreAdapter
+from app.configs.config import settings 
+from app.core.qdrant_service import VectorStoreAdapter
 from app.ingestion.metadata_stor import LocalMetadataStore
 from app.ingestion.loaders.load_factory import LoaderFactory
 from app.ingestion.chunking.splitter import chunk_text
-from app.ingestion.embedding.embedding import embed_texts, get_embedding_dim
+from app.core.embedding.embedding import embed_texts, get_embedding_dim
 
 
 class IngestionPipeline:
@@ -29,26 +29,19 @@ class IngestionPipeline:
         self.vector_store = vector_store
         self.metadata_store = metadata_store
 
-    def run(
-        self,
-        base_dir: str,
-        explicit_source_type: str | None = None,
-        wipe: bool = False,
-    ):
+    def run(self,base_dir: str,explicit_source_type: str | None = None,wipe: bool = False,) ->None:
         """
         Scan base_dir, map sub-folders to source types, and ingest all documents.
         """
         with logfire.span("Universal Ingestion Started", base_directory=base_dir):
             if wipe:
                 self.vector_store.wipe_collection()
-
-            dim = get_embedding_dim()
-            self.vector_store.ensure_collection_exists(dim)
-
-            subdirs = [
-                d for d in os.listdir(base_dir)
-                if os.path.isdir(os.path.join(base_dir, d))
-            ]
+            
+            if not self.vector_store.collection_exist(settings.QDRANT_COLLECTION) : 
+                dim = get_embedding_dim()
+                self.vector_store.ensure_collection_exists(dim)
+                
+            subdirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
 
             if not subdirs:
                 source_type = explicit_source_type or self._infer_source_type(base_dir)

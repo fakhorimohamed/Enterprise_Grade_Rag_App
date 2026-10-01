@@ -2,8 +2,8 @@ import logfire
 from typing import Type
 
 from app.ingestion.loaders.base import BaseLoader
-from app.ingestion.loaders.pdf import PDFLoader
-from app.ingestion.loaders.html import HTMLLoader
+from app.ingestion.loaders.pdf import PdfLoader
+from app.ingestion.loaders.html import HtmlLoader
 from app.ingestion.loaders.text import TextLoader
 from app.ingestion.loaders.office import OfficeLoader
 
@@ -17,9 +17,8 @@ class LoaderFactory:
     """
 
     _LOADERS: dict[str, Type[BaseLoader]] = {
-        "pdf": PDFLoader,
-        "html": HTMLLoader,
-        "htm": HTMLLoader,
+        "pdf": PdfLoader,
+        "html": HtmlLoader,
         "txt": TextLoader,
         "docx": OfficeLoader,
         "pptx": OfficeLoader,

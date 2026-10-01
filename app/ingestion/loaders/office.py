@@ -1,14 +1,11 @@
-from app.ingestion.loaders.base import BaseClass
+from app.ingestion.loaders.base import BaseLoader
 
 from unstructured.partition.auto import partition
 import logfire
 
-class OfficeLoader (BaseClass) :
-    def __init(self) :
-        pass
-    
-    
-    def parse_office(file_path: str):
+class OfficeLoader (BaseLoader) :
+    @classmethod
+    def parse_office(cls , file_path: str):
         """
         Parses Office documents (.docx, .pptx) using the Unstructured library.
         Unlike PDFs, these formats are structured and lightweight, so they are processed locally.

@@ -2,8 +2,8 @@ from typing import List
 import logfire
 import requests
 from tenacity import retry, stop_after_attempt, wait_exponential, before_sleep_log
-from app.ingestion.embedding.configloader import EmbeddingConfig
-from app.ingestion.embedding.embed_provider import EmbeddingProvider
+from app.core.embedding.configloader import EmbeddingConfig
+from app.core.embedding.embed_provider import EmbeddingProvider
 class JinaEmbeddingProvider(EmbeddingProvider):
     def __init__(self, config: EmbeddingConfig, api_key: str):
         self.config = config
