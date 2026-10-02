@@ -1,18 +1,13 @@
 from app.core.qdrant_service import VectorStoreAdapter
-from app.ingestion.metadata_stor import LocalMetadataStore 
-
 from app.ingestion.loaders.load_factory import LoaderFactory
-
-
-import os
-import logfire
-from app.configs.config import settings 
 from app.core.qdrant_service import VectorStoreAdapter
 from app.ingestion.metadata_stor import LocalMetadataStore
 from app.ingestion.loaders.load_factory import LoaderFactory
 from app.ingestion.chunking.splitter import chunk_text
 from app.core.embedding.embedding import embed_texts, get_embedding_dim
-
+from app.configs.config import settings 
+import os
+import logfire
 
 class IngestionPipeline:
     """
@@ -37,9 +32,8 @@ class IngestionPipeline:
             if wipe:
                 self.vector_store.wipe_collection()
             
-            if not self.vector_store.collection_exist(settings.QDRANT_COLLECTION) : 
-                dim = get_embedding_dim()
-                self.vector_store.ensure_collection_exists(dim)
+            dim = get_embedding_dim()
+            self.vector_store.ensure_collection_exists(dim)
                 
             subdirs = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
 
@@ -85,7 +79,7 @@ class IngestionPipeline:
                 if not chunks:
                     return
 
-                self.metadata_store.save(
+                self.metadata_store.save_processed_locally(
                     filename=filename,
                     source_type=source_type,
                     data={

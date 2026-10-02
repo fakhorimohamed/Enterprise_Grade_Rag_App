@@ -5,7 +5,7 @@ import logfire
 
 class OfficeLoader (BaseLoader) :
     @classmethod
-    def parse_office(cls , file_path: str):
+    def load(cls , file_path: str):
         """
         Parses Office documents (.docx, .pptx) using the Unstructured library.
         Unlike PDFs, these formats are structured and lightweight, so they are processed locally.

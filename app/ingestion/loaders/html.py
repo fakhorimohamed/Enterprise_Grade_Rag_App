@@ -5,7 +5,7 @@ import logfire
 
 class HtmlLoader (BaseLoader) :
     @classmethod
-    def Load(cls , file_path: str)-> str :
+    def load(cls , file_path: str)-> str :
             """
             Parses HTML content using BeautifulSoup.
             Cleans scripts, styles, and extracts readable text for RAG.

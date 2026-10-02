@@ -9,7 +9,7 @@ import logfire
 class VectorStoreAdapter : 
     
     def __init__(self , qdrant_url: str ,  qdrant_api_key : str , default_collection:str = settings.QDRANT_COLLECTION)  : 
-        self.qdrant_client = QdrantClient(url=qdrant_api_key , 
+        self.qdrant_client = QdrantClient(url=qdrant_url , 
                                           api_key=qdrant_api_key,
                                           ) 
         self.default_collection = default_collection 
@@ -31,17 +31,17 @@ class VectorStoreAdapter :
     def wipe_collection (self ,  collection_name : Optional[str] =None) ->None: 
         target = self._get_collection(collection_name) 
         with logfire.span("Wiping Qdrant Collection", collection=target):
-            if self._get_collection(target) :
+            if self.collection_exist(target) :
                 self.qdrant_client.delete_collection(target)
                 logfire.info(f"Collection '{target}' deleted.")
             else : 
                 logfire.info(f"Collection '{target}' did not exist — nothing to wipe.")
     
     def ensure_collection_exists(self, dim: int, collection_name: Optional[str] = None) -> None:
-        target = self._resolve_collection(collection_name)
+        target = self._get_collection(collection_name)
         with logfire.span("Ensuring Qdrant Collection Exists", collection=target, dim=dim):
-            if not self.collection_exists(target):
-                self.client.create_collection(
+            if not self.collection_exist(target):
+                self.qdrant_client.create_collection(
                     collection_name=target,
                     vectors_config=models.VectorParams(
                         size=dim,

@@ -1,12 +1,9 @@
-from  app.ingestion.processor import IngestionPipeline 
-from app.core.qdrant_service import VectorStoreAdapter 
-from app.ingestion.metadata_stor import LocalMetadataStore
-from app.configs.config import settings 
-import argparse
-import logfire 
 import os
-import sys 
+import sys
 
+import logfire
+import argparse
+from app.configs.config import settings
 _logfire_base_url = settings.LOGFIRE_BASE_URL
 if not _logfire_base_url and settings.LOGFIRE_TOKEN:
     if settings.LOGFIRE_TOKEN.startswith("pylf_v2_eu_"):
@@ -18,6 +15,14 @@ if settings.LOGFIRE_TOKEN:
         service_name="enterprise-ingestion-service",
         advanced=logfire.AdvancedOptions(base_url=_logfire_base_url) if _logfire_base_url else None,
     )
+
+from  app.ingestion.processor import IngestionPipeline 
+from app.core.qdrant_service import VectorStoreAdapter 
+from app.ingestion.metadata_stor import LocalMetadataStore
+
+
+
+
     
 def main () :
     parser = argparse.ArgumentParser(
@@ -43,7 +48,7 @@ def main () :
         sys.exit(1)
     
     with logfire.span(" Universal Data Ingestion",target_dir =args.target_dir ,explicit_type=args.explicit_type ,wipe=args.wipe ) :
-        vector_store = VectorStoreAdapter(settings.QDRANT_URL , settings.QDRANT_API_KEY , settings.QDRANT_COLLECTION)
+        vector_store = VectorStoreAdapter(settings.QDRANT_CLUSTER_ENDPOINT , settings.QDRANT_API_KEY , settings.QDRANT_COLLECTION)
         local_store = LocalMetadataStore(base_dir=args.target_dir)
         
         #Create IngestionPipeline instance 

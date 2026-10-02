@@ -31,10 +31,14 @@ class Settings (BaseSettings) :
     GEMINI_API_KEY :str 
     
     # --- QDRANT VECTOR DB ---
-    QDRANT_URL: str = Field(validation_alias=AliasChoices("QDRANT_URL", "QDRANT_CLUSTER_ENDPOINT"))
+    QDRANT_CLUSTER_ENDPOINT: str = Field(validation_alias=AliasChoices("QDRANT_URL", "QDRANT_CLUSTER_ENDPOINT"))
     QDRANT_API_KEY: str | None = None
     QDRANT_COLLECTION: str = "enterprise_rag"
 
+    # --- OBSERVABILITY ---
+    
+    LOGFIRE_TOKEN: str | None = None
+    LOGFIRE_BASE_URL: str | None = None
 
 # Singleton used across the app.
 settings = Settings()
