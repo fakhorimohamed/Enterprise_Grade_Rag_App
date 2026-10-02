@@ -49,7 +49,7 @@ def main () :
     
     with logfire.span(" Universal Data Ingestion",target_dir =args.target_dir ,explicit_type=args.explicit_type ,wipe=args.wipe ) :
         vector_store = VectorStoreAdapter(settings.QDRANT_CLUSTER_ENDPOINT , settings.QDRANT_API_KEY , settings.QDRANT_COLLECTION)
-        local_store = LocalMetadataStore(base_dir=args.target_dir)
+        local_store = LocalMetadataStore(base_dir="processed_data" , wipe=args.wipe)
         
         #Create IngestionPipeline instance 
         pipeline = IngestionPipeline(vector_store , local_store)

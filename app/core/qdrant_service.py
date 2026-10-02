@@ -1,9 +1,9 @@
 from qdrant_client import QdrantClient
 from qdrant_client.http import models
 from app.configs.config import settings
-from typing import Optional
+from typing import Optional,List , Dict , Any
 import logfire 
-
+import uuid
 
 
 class VectorStoreAdapter : 
@@ -51,6 +51,50 @@ class VectorStoreAdapter :
                 logfire.info(f"Created collection '{target}' ({dim}-dim, Cosine).")
             else:
                 logfire.info(f"Collection '{target}' already exists.")
+    
+    
+    def upsert_chunks(self, chunks: List[Dict[str, Any]],embeddings :list[list[float]] , source:str , source_type:str ,  collection_name: Optional[str] = None) -> None:
+        """
+        Upsert a list of chunk dictionaries into Qdrant.
+        
+        Expected chunk format:
+        {
+            "id": "unique_chunk_id",
+            "embedding": [0.1, 0.2, ...],  # List of floats
+            "text": "The chunk text content",
+            "souce": {"source": "file.pdf"} , 
+            "source_type":"PDF" , "TXT" .....
+        }
+        """
+        target = self._get_collection(collection_name)
+        
+        with logfire.span("Upserting chunks to Qdrant", collection=target, chunk_count=len(chunks)):
+            if not chunks:
+                logfire.warn("No chunks to upsert.")
+                return
+
+            # Transform chunks into Qdrant PointStruct format
+            points = [
+                models.PointStruct(
+                    id=str(uuid.uuid5(uuid.NAMESPACE_DNS, f"{source}_{chunk[:100]}")), # Fallback ID if missing
+                    vector=vector,
+                    payload={
+                        "text": chunk,
+                        "source": source,
+                        "source_type": source_type,
+                    },
+                )
+                for chunk , vector in zip(chunks , embeddings)
+            ]
+            
+            # Perform the upsert
+            self.qdrant_client.upsert(
+                collection_name=target,
+                points=points,
+                wait=True # Ensure it's written before moving on
+            )
+            
+            logfire.info(f"✅ Successfully upserted {len(points)} chunks to '{target}'")
                 
     
     
