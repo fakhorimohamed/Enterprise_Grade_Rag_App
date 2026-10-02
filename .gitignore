@@ -1,22 +1,60 @@
 # Python
 __pycache__/
 *.py[cod]
-.venv/
+*$py.class
+*.so
+.Python
+env/
 venv/
+.venv/
+genv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
 # Environment variables
 .env
-.env.*
 
-# Jupyter
-.ipynb_checkpoints/
+# Local Vector Store
+index.faiss
+metadata.pkl
 
-# IDE
+# Data
+
+
+# IDEs
 .vscode/
-
-# Logs
-*.log
+.idea/
 
 # OS
 .DS_Store
 Thumbs.db
+
+enterprise_env
+
+commands.md
+
+.logfire
+
+tenvv
+
+# Claude Code memory & session data
+.claude/
+
+# Logs
+*.log
+
+# Redis local dump
+dump.rdb
