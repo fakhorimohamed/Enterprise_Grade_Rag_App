@@ -1,4 +1,4 @@
-
+ipykernel
 # --- CORE API & WEB FRAMEWORK ---
 fastapi                   
 uvicorn[standard]         

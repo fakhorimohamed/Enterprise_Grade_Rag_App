@@ -22,6 +22,8 @@ class Settings (BaseSettings) :
     
     #-------------------JINA API KEY (embeddings + reranker) -----------#
     JINA_API_KEY : str 
+    JINA_RERANK_MODEL:str = "jina-reranker-v3"
+    JINA_RERANK_URL:str = "https://api.jina.ai/v1/rerank"
     #---------------QROQ API key ---------------####
     
     GROQ_API_KEY :str 
@@ -31,14 +33,13 @@ class Settings (BaseSettings) :
     GEMINI_API_KEY :str 
     
     # --- QDRANT VECTOR DB ---
-    QDRANT_CLUSTER_ENDPOINT: str = Field(validation_alias=AliasChoices("QDRANT_URL", "QDRANT_CLUSTER_ENDPOINT"))
+    QDRANT_CLUSTER_ENDPOINT: str = "https://bfedb5fe-294f-4631-8fe4-d347453614dd.sa-east-1-0.aws.cloud.qdrant.io" ,
     QDRANT_API_KEY: str | None = None
     QDRANT_COLLECTION: str = "enterprise_rag"
 
     # --- OBSERVABILITY ---
     
     LOGFIRE_TOKEN: str | None = None
-    LOGFIRE_BASE_URL: str | None = None
-
+    LOGFIRE_BASE_URL: str| None = None
 # Singleton used across the app.
 settings = Settings()
