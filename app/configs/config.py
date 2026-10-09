@@ -28,6 +28,9 @@ class Settings (BaseSettings) :
     
     GROQ_API_KEY :str 
     GROQ_FALLBACK_API_KEY : str 
+
+    # --- NEON SERVERLESS POSTGRES (LangGraph checkpointer) ---
+    NEON_DB_URL :str 
     
     #---------------Gemini API-Key ------------#
     GEMINI_API_KEY :str 
@@ -41,5 +44,19 @@ class Settings (BaseSettings) :
     
     LOGFIRE_TOKEN: str | None = None
     LOGFIRE_BASE_URL: str| None = None
+
+    @property 
+    def postgres_uri(self)-> str :
+        """LangGraph Postgres checkpointer URI (Neon).
+           Serverless Postgres closes idle connections, so append TCP keepalive
+           options to keep the connection pool healthy between requests.
+        """
+        base =self.NEON_DB_URL.rstrip("/")
+        keep_alive ="keepalives=1&keepalives_idle=30&keepalives_interval=10&keepalives_count=5"
+
+        if "?" in base :
+            return f"{base}&{keep_alive}"
+        return f"{base}?{keep_alive}"
+
 # Singleton used across the app.
 settings = Settings()

@@ -1,4 +1,9 @@
 ipykernel
+
+#---- Agent WorkFlow ------#
+langgraph
+sycopg_pool
+
 # --- CORE API & WEB FRAMEWORK ---
 fastapi                   
 uvicorn[standard]         
