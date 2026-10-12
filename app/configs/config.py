@@ -35,6 +35,13 @@ class Settings (BaseSettings) :
     #---------------Gemini API-Key ------------#
     GEMINI_API_KEY :str 
     
+    
+    # --- PORTKEY LLM GATEWAY ---
+    PORTKEY_API_KEY: str
+    PORTKEY_PRIMARY_SLUG: str = "gemini-prod"
+    PORTKEY_FALLBACK_SLUG: str = "groq-prod"
+    PORTKEY_PRIMARY_CONFIG_ID: str
+
     # --- QDRANT VECTOR DB ---
     QDRANT_CLUSTER_ENDPOINT: str = "https://bfedb5fe-294f-4631-8fe4-d347453614dd.sa-east-1-0.aws.cloud.qdrant.io" ,
     QDRANT_API_KEY: str | None = None

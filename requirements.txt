@@ -2,7 +2,7 @@ ipykernel
 
 #---- Agent WorkFlow ------#
 langgraph
-sycopg_pool
+psycopg-pool
 
 # --- CORE API & WEB FRAMEWORK ---
 fastapi                   
