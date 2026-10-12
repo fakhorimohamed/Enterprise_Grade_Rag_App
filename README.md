@@ -1,118 +1,154 @@
-# Enterprise Agentic RAG
+# Enterprise Agentic RAG (Scalable Pipeline)
 
-A scalable, production-oriented **Agentic Retrieval-Augmented Generation (RAG)** system built with LangGraph, designed to provide accurate, context-aware answers while ensuring security, observability, and reliability.
+A production-grade, enterprise-level RAG system built with **LangGraph**, **Portkey LLM Gateway**, **OpenAI**, and **Jina AI Embeddings/Reranker**. The system distinguishes between technical "True Data" and random "Noisy Data" using semantic re-ranking, history-aware planning, and NeMo Guardrails for input/output safety.
 
-The system combines multi-step agentic reasoning, semantic retrieval, document reranking, and security guardrails to distinguish relevant information from noisy or irrelevant data.
+## Key Features
 
-## Features
+- **Agentic Intelligence**: LangGraph for cyclic reasoning, multi-step planning, and conversation memory.
+- **Guardrails**: NeMo Guardrails gate blocks off-topic, jailbreak, and injection inputs before any retrieval.
+- **LLM Gateway**: Portkey routes all LLM calls with automatic fallback between OpenAI and Anthropic via your configured Portkey virtual providers.
+- **Enterprise Search**: Qdrant Cloud for high-performance vector search + Jina AI Reranker API for semantic reranking.
+- **Jina AI Embeddings**: `jina-embeddings-v3` (1024-dim) via Jina API, with local `mxbai-embed-large-v1` fallback.
+- **Local Document Parsing**: PDF, HTML, TXT, DOCX, PPTX parsed entirely on-device — no external OCR service.
+- **Observability**: Full trace nesting with **Pydantic Logfire** and **LangSmith** across every agent node.
+- **Metrics**: Prometheus `/metrics` endpoint with custom RAG and guardrails counters.
+- **Synchronous `/query`**: The LangGraph pipeline runs directly inside the `/query` endpoint and returns the final answer.
+- **API Key & Rate Limiting**: Optional bearer-token auth and Redis-backed (or in-memory) rate limiting.
+- **Evaluation Suite**: RAGAS-powered eval pipeline (6 metrics) with a dedicated Streamlit demo app and a headless `evals/run_evals.py` script.
 
-* **Agentic Workflow:** LangGraph orchestrates multi-step reasoning, query planning, and conversational memory.
-* **Security Guardrails:** NVIDIA NeMo Guardrails protects against prompt injection, jailbreak attempts, and off-topic queries.
-* **LLM Gateway:** Portkey manages LLM requests and supports automatic fallback between OpenAI and Anthropic.
-* **Vector Database:** Qdrant Cloud provides scalable vector storage and semantic retrieval.
-* **Semantic Reranking:** Jina AI Reranker improves retrieval relevance by reordering retrieved documents.
-* **Embeddings:** Jina AI `jina-embeddings-v3` generates 1024-dimensional embeddings, with a local `mxbai-embed-large-v1` fallback.
-* **Document Processing:** Local parsing of PDF, HTML, TXT, DOCX, and PPTX files without relying on external OCR services.
-* **Observability:** Pydantic Logfire and LangSmith provide tracing and monitoring across agent workflows.
-* **Metrics:** Prometheus exposes custom RAG and guardrails metrics through a `/metrics` endpoint.
-* **REST API:** A synchronous `/query` endpoint executes the LangGraph pipeline and returns the generated answer.
-* **Authentication:** Optional API key authentication and Redis-backed or in-memory rate limiting.
-* **Evaluation:** RAGAS-based evaluation with six metrics, a Streamlit demo, and a headless evaluation script.
+---
 
-## Architecture
+## Agent Intelligence Flow
 
-The system follows a modular architecture composed of the following components:
+```mermaid
+graph TD
+    User((User)) --> UI[Streamlit UI]
+    UI --> API[FastAPI /query]
+    API --> Guard{NeMo Guardrails}
+    Guard -->|Blocked| UI
+    Guard -->|Pass| Planner{Planner Node}
+    Planner -->|Conversational| Responder[Responder Node]
+    Planner -->|Technical| Retriever[Retriever Node]
+    Retriever --> Reranker[Jina AI Reranker API]
+    Reranker --> Responder
+    Responder --> UI
+    Responder -.-> Memory[(LangGraph MemorySaver)]
+```
 
-1. **Document Ingestion:** Loads and parses documents locally, preparing them for indexing.
-2. **Embedding Generation:** Converts document chunks into vector representations using Jina AI or a local embedding model.
-3. **Vector Storage:** Stores document embeddings and metadata in Qdrant Cloud.
-4. **Query Processing:** Validates incoming queries through NeMo Guardrails before retrieval.
-5. **Agentic Orchestration:** LangGraph coordinates query planning, retrieval, reranking, and answer generation.
-6. **Semantic Retrieval:** Retrieves relevant documents from Qdrant and reranks them using Jina AI.
-7. **Answer Generation:** Uses the configured LLM through Portkey to generate context-aware responses.
-8. **Observability and Evaluation:** Tracks execution, collects metrics, and evaluates retrieval and generation quality.
-
-## Technology Stack
-
-| Component           | Technology                  |
-| ------------------- | --------------------------- |
-| Agent Orchestration | LangGraph                   |
-| LLM Gateway         | Portkey                     |
-| Language Models     | OpenAI, Anthropic           |
-| Embeddings          | Jina AI, mxbai              |
-| Reranking           | Jina AI Reranker            |
-| Vector Database     | Qdrant Cloud                |
-| Guardrails          | NVIDIA NeMo Guardrails      |
-| API                 | FastAPI                     |
-| Observability       | Pydantic Logfire, LangSmith |
-| Metrics             | Prometheus                  |
-| Evaluation          | RAGAS                       |
-| Demo Interface      | Streamlit                   |
-| Rate Limiting       | Redis                       |
+---
 
 ## Project Structure
 
 ```text
-enterprise-agentic-rag/
-│
+Enterprise_Grade_Rag_App/
 ├── app/
-│   ├── api/                 # FastAPI endpoints
-│   ├── agents/              # LangGraph agents and workflows
-│   ├── ingestion/           # Document loading and processing
-│   ├── retrieval/           # Vector search and reranking
-│   ├── guardrails/          # Input and output validation
-│   ├── llm/                 # LLM gateway configuration
-│   └── core/                # Application configuration
-│
-├── evals/                   # RAGAS evaluation scripts
-│   └── run_evals.py
-│
-├── frontend/                # Streamlit demo application
-│
-├── tests/                   # Unit and integration tests
-├── data/                    # Local document storage
-├── .env.example             # Environment variable template
-├── requirements.txt         # Python dependencies
-└── README.md
+│   ├── agents/
+│   │   ├── nodes/       # Planner, Retriever, Responder LangGraph nodes
+│   │   ├── __init__.py
+│   │   ├── graph.py     # LangGraph workflow definition
+│   │   └── state.py     # Shared agent state schema
+│   ├── configs/         # Configuration files
+│   ├── core/            # Core application logic
+│   ├── gateway/         # Portkey LLM gateway — primary + fallback routing
+│   ├── guardrails/      # NeMo Guardrails input/output filtering
+│   ├── ingestion/       # Local parsers (PDF, HTML, TXT, DOCX, PPTX) + chunking
+│   ├── prompts/         # Prompt templates
+│   ├── services/        # Jina AI embeddings + Qdrant search + Jina AI reranking
+│   └── __init__.py
+├── DATA/                # Sample datasets (True vs Noisy documentation)
+├── evals/               # RAGAS evaluation suite + Streamlit 3-tab demo
+├── notebook/            # Experiments and exploration notebooks
+├── processed_data/      # Auto-generated — parsed & chunked JSON output per document
+├── scripts/             # Utility scripts
+├── tests/               # Unit tests
+├── .env                 # Environment variables (not committed)
+├── .gitignore
+├── pyproject.toml       # Project metadata and dependencies (uv)
+├── README.md
+├── requirements.txt     # Pinned dependencies
+└── uv.lock              # uv lockfile
 ```
 
-*Note: The directory structure above is a suggested organization and should be adjusted to match the actual repository.*
+---
 
-## Installation
+## Tech Stack
 
-### 1. Clone the repository
+| Layer | Technology |
+|-------|-----------|
+| Orchestration | LangChain + LangGraph |
+| LLMs | OpenAI `gpt-5-mini` + Anthropic fallback via **Portkey** gateway |
+| Guardrails | NeMo Guardrails |
+| Vector DB | Qdrant Cloud |
+| Reranking | Jina AI Reranker API (`jina-reranker-v3`) |
+| Embeddings | Jina AI `jina-embeddings-v3` (1024-dim) + local mxbai fallback |
+| Document Parsing | pypdf + pdfplumber (local, no OCR service) |
+| Observability | Pydantic Logfire + LangSmith |
+| Evaluation | RAGAS + custom Tool Correctness (Jaccard) |
 
-```bash
-git clone <repository-url>
-cd enterprise-agentic-rag
-```
+---
 
-### 2. Create a virtual environment
+## Getting Started
 
-```bash
-python -m venv .venv
-```
-
-Activate the environment:
-
-**Windows**
+### 1. Install dependencies
 
 ```powershell
-.venv\Scripts\activate
+uv python -m venv tenvv
+.\tenvv\Scripts\activate
+ uv add -r requirements.txt
 ```
 
-**Linux / macOS**
+### 2. Configure environment
 
-```bash
-source .venv/bin/activate
+Create a `.env` file with the following keys:
+
+```env
+# Gemini LLM
+Gemini_API_KEY = "..."
+
+# LLM Gateway
+PORTKEY_API_KEY = "..."
+
+# Jina AI Embeddings + Reranker API
+JINA_API_KEY = "..."
+
+# Vector DB
+QDRANT_API_KEY = "..."
+QDRANT_CLUSTER_ENDPOINT = "https://your-cluster.cloud.qdrant.io:6333"
+
+# Production persistence (Neon) & cache (Upstash Redis)
+NEON_DB_URL = "postgresql://user:password@host.neon.tech/enterprise_rag?sslmode=require"
+UPSTASH_REDIS_REST_URL = "https://your-db.upstash.io"
+UPSTASH_REDIS_REST_TOKEN = "your-upstash-token"
+
+# API safety
+RAG_API_KEY = ""                       # set in production to require bearer auth
+RATE_LIMIT_PER_MINUTE = 20
+
+# Observability
+LOGFIRE_TOKEN = "..."
+LANGSMITH_API_KEY = "..."
+LANGSMITH_PROJECT = "enterprise_rag"
+LANGSMITH_TRACING = true
+LANGSMITH_ENDPOINT = https://api.smith.langchain.com
+
+
+
 ```
 
-### 3. Install dependencies
+### 3. Run data ingestion
 
-```bash
-pip install -r requirements.txt
+Parses all documents in `DATA/`, chunks them, saves metadata to `processed_data/`, and indexes vectors into Qdrant.
+
+```powershell
+python -m app.ingestion.processor DATA/true_data --wipe
 ```
 
-### 4. Configure environment variables
+> Pass `--wipe` to drop and recreate the Qdrant collection. Omit it to append to an existing collection.
 
-Create a
+# Terminal 2 — Streamlit UI
+streamlit run ui/app.py
+```
+
+
+
+*Built for High-Scale Enterprise Document Intelligence.*
